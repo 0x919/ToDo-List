@@ -1,0 +1,4 @@
+{
+  "exec": "tsx src/app.ts",
+  "ext": ".ts,.js"
+}
