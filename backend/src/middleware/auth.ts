@@ -2,22 +2,20 @@ import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 require("dotenv").config();
 
-const verifyToken = (req: Request, res: Response, next: NextFunction) => {
-  const token = req.headers["authorization"];
+export const verifyToken = (req: Request, res: Response, next: NextFunction) => {
+  const token = req.cookies.token;
   if (!token) {
-    return res.status(401).json({ error: "JWT token missing" });
+    res.status(401).json({ error: "JWT token missing" });
+    return;
   }
 
   try {
-    const isCorrect = jwt.verify(token, process.env.JWT_SECRET as string);
-
-    if (!isCorrect) {
-      res.status(401).json({ error: "Invalid JWT token" });
-      return;
-    }
+    const data = jwt.verify(token, process.env.JWT_SECRET as string);
+    res.locals.email = (data as any).email;
+    res.locals.userId = (data as any).userId;
 
     next();
   } catch (error) {
-    res.sendStatus(500);
+    res.status(401).json({ error: "Invalid JWT token" });
   }
 };
