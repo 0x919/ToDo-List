@@ -22,7 +22,33 @@ router.post("/", async (req, res) => {
 router.get("/", async (req, res) => {
   try {
     const result = await pool.query("SELECT * FROM tasks WHERE user_id = $1", [res.locals.userId]);
-  } catch (error) {}
+    res.json(result.rows);
+  } catch (error) {
+    res.sendStatus(500);
+  }
+});
+
+router.put("/", async (req, res) => {
+  const { id, title, completed } = req.body;
+
+  try {
+    const result = await pool.query("UPDATE tasks SET title = $1, completed = $2 WHERE id = $3 AND user_id = $4", [
+      title,
+      completed,
+      id,
+      res.locals.userId,
+    ]);
+
+    if (result.rowCount === 0) {
+      res.status(404).json({ error: "Task not found or authorization failed" });
+      return;
+    }
+
+    res.json({ message: "Modified task" });
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(500);
+  }
 });
 
 export default router;
