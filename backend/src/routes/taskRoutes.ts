@@ -12,7 +12,7 @@ router.post("/", async (req, res) => {
       res.locals.userId,
     ]);
 
-    res.json({ message: "Created task" });
+    res.json({ title, completed: false, id: result.rows[0].id });
   } catch (error) {
     console.error(error);
     res.sendStatus(500);
@@ -22,7 +22,8 @@ router.post("/", async (req, res) => {
 router.get("/", async (req, res) => {
   try {
     const result = await pool.query("SELECT * FROM tasks WHERE user_id = $1", [res.locals.userId]);
-    res.json(result.rows);
+    const sanitizedItems = result.rows.map(({ user_id, ...rest }) => rest);
+    res.json(sanitizedItems);
   } catch (error) {
     res.sendStatus(500);
   }
@@ -45,6 +46,24 @@ router.put("/", async (req, res) => {
     }
 
     res.json({ message: "Modified task" });
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(500);
+  }
+});
+
+router.delete("/", async (req, res) => {
+  const { id } = req.body;
+
+  try {
+    const result = await pool.query("DELETE FROM tasks WHERE id = $1 AND user_id = $2", [id, res.locals.userId]);
+
+    if (result.rowCount === 0) {
+      res.status(404).json({ error: "Task not found or authorization failed" });
+      return;
+    }
+
+    res.json({ message: "Deleted task" });
   } catch (error) {
     console.error(error);
     res.sendStatus(500);
