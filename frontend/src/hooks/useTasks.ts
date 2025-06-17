@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import type { Task } from "../types";
 import { handleAxiosError } from "../lib/utils";
+import apiClient from "../lib/apiClient";
 
 export function useTasks() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -17,7 +17,7 @@ export function useTasks() {
     setFetching(true);
     setError(null);
     try {
-      const response = await axios.get("/api/tasks");
+      const response = await apiClient.get("/api/tasks");
       setTasks(response.data);
     } catch (err) {
       setError(handleAxiosError(err));
@@ -34,7 +34,7 @@ export function useTasks() {
     setAdding(true);
     setError(null);
     try {
-      const response = await axios.post("/api/tasks", { title });
+      const response = await apiClient.post("/api/tasks", { title });
       setTasks([...tasks, response.data]);
     } catch (err) {
       setError(handleAxiosError(err));
@@ -47,7 +47,7 @@ export function useTasks() {
     setUpdating(true);
     setError(null);
     try {
-      await axios.put("/api/tasks", updatedTask);
+      await apiClient.put("/api/tasks", updatedTask);
       setTasks([...tasks.filter((task) => task.id !== updatedTask.id), updatedTask]);
     } catch (err) {
       setError(handleAxiosError(err));
@@ -60,7 +60,7 @@ export function useTasks() {
     setDeleting(true);
     setError(null);
     try {
-      await axios.delete("/api/tasks", { data: { id } });
+      await apiClient.delete("/api/tasks", { data: { id } });
       setTasks([...tasks.filter((task) => task.id !== id)]);
     } catch (err) {
       setError(handleAxiosError(err));
