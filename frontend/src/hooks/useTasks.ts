@@ -3,14 +3,18 @@ import type { Task } from "../types";
 import { handleAxiosError } from "../lib/utils";
 import apiClient from "../lib/apiClient";
 
+function sortTasksByCompletion(tasks: Task[]): Task[] {
+  return tasks.slice().sort((a, b) => {
+    return (a.completed ? 1 : 0) - (b.completed ? 1 : 0);
+  });
+}
+
 export function useTasks() {
   const [tasks, setTasks] = useState<Task[]>([]);
-
   const [fetching, setFetching] = useState(false);
   const [adding, setAdding] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [updating, setUpdating] = useState(false);
-
   const [error, setError] = useState<string | null>(null);
 
   const fetchTasks = async () => {
@@ -18,7 +22,8 @@ export function useTasks() {
     setError(null);
     try {
       const response = await apiClient.get("/api/tasks");
-      setTasks(response.data);
+      const sorted = sortTasksByCompletion(response.data);
+      setTasks(sorted);
     } catch (err) {
       setError(handleAxiosError(err));
     } finally {
@@ -35,9 +40,13 @@ export function useTasks() {
     setError(null);
     try {
       const response = await apiClient.post("/api/tasks", { title });
-      setTasks([...tasks, response.data]);
+      const newTask: Task = response.data;
+      setTasks((prev) => {
+        const merged = [...prev, newTask];
+        return sortTasksByCompletion(merged);
+      });
     } catch (err) {
-      setError(handleAxiosError(err));
+      throw handleAxiosError(err);
     } finally {
       setAdding(false);
     }
@@ -48,9 +57,12 @@ export function useTasks() {
     setError(null);
     try {
       await apiClient.put("/api/tasks", updatedTask);
-      setTasks([...tasks.filter((task) => task.id !== updatedTask.id), updatedTask]);
+      setTasks((prevTasks) => {
+        const replaced = prevTasks.map((t) => (t.id === updatedTask.id ? updatedTask : t));
+        return sortTasksByCompletion(replaced);
+      });
     } catch (err) {
-      setError(handleAxiosError(err));
+      throw handleAxiosError(err);
     } finally {
       setUpdating(false);
     }
@@ -63,7 +75,7 @@ export function useTasks() {
       await apiClient.delete("/api/tasks", { data: { id } });
       setTasks([...tasks.filter((task) => task.id !== id)]);
     } catch (err) {
-      setError(handleAxiosError(err));
+      throw handleAxiosError(err);
     } finally {
       setDeleting(false);
     }
