@@ -88,7 +88,7 @@ export function TaskItem({ task, onUpdate, onDelete }: TaskItemProps) {
         onChange={handleToggleComplete}
         disabled={loading}
         aria-label={task.completed ? "Mark as incomplete" : "Mark as complete"}
-        className="form-checkbox h-4 w-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+        className="form-checkbox h-4 w-4 bg-blue-500 rounded focus:ring-2 focus:ring-blue-600"
       />
       {isEditing ? (
         <>
@@ -122,7 +122,7 @@ export function TaskItem({ task, onUpdate, onDelete }: TaskItemProps) {
           <button
             onClick={handleEditClick}
             disabled={loading}
-            className="px-2 py-1 bg-yellow-400 rounded disabled:opacity-50 hover:cursor-pointer hover:bg-yellow-500"
+            className="px-2 py-1 bg-blue-500 rounded disabled:opacity-50 hover:cursor-pointer hover:bg-blue-600"
           >
             ✏
           </button>

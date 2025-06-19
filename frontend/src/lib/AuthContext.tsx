@@ -9,6 +9,7 @@ interface ProviderProps {
   isAuthenticated: boolean;
   loading: boolean;
   error: string;
+  resetError(): void;
 }
 
 export const AuthContext = createContext<ProviderProps>({
@@ -19,4 +20,5 @@ export const AuthContext = createContext<ProviderProps>({
   isAuthenticated: false,
   loading: false,
   error: "",
+  resetError: () => {},
 });

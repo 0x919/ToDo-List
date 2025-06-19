@@ -24,7 +24,11 @@ router.post("/register", async (req, res) => {
       hashedPassword,
     ]);
 
-    res.json({ msg: "User registered!" });
+    const token = jwt.sign({ email, userId: result.rows[0].id }, process.env.JWT_SECRET as string);
+
+    res
+      .cookie("token", token, { httpOnly: true, secure: true, maxAge: 7 * 24 * 60 * 60 * 1000 })
+      .json({ msg: "User registered!" });
   } catch (err) {
     res.sendStatus(500);
   }
@@ -40,7 +44,7 @@ router.post("/login", async (req, res) => {
       return;
     }
 
-    const isMatch = bcrypt.compare(password, rows[0].passwordhash);
+    const isMatch = await bcrypt.compare(password, rows[0].passwordhash);
     if (!isMatch) {
       res.status(401).json({ error: "Wrong password" });
       return;

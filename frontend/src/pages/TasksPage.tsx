@@ -52,7 +52,7 @@ export default function TasksPage() {
           <button
             type="submit"
             disabled={adding}
-            className="px-4 py-2 bg-green-500 text-white rounded disabled:opacity-50"
+            className="px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50 hover:cursor-pointer hover:bg-blue-600"
           >
             Add
           </button>
@@ -73,7 +73,7 @@ export default function TasksPage() {
         <button
           onClick={refetch}
           disabled={fetching}
-          className="mt-4 px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
+          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50 hover:cursor-pointer hover:bg-blue-600"
         >
           Refresh
         </button>

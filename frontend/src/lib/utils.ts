@@ -6,5 +6,5 @@ import { isAxiosError } from "axios";
  * @returns A user-friendly error message
  */
 export function handleAxiosError(err: unknown) {
-  return isAxiosError(err) && err.response?.data.message ? err.response?.data.message : "An unknown error occured";
+  return isAxiosError(err) && err.response?.data.error ? err.response?.data.error : "An unknown error occured";
 }

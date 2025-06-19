@@ -2,6 +2,7 @@ import { useCallback, useState, useEffect } from "react";
 import type { User } from "./types";
 import { AuthContext } from "./AuthContext";
 import apiClient from "./apiClient";
+import { handleAxiosError } from "./utils";
 
 interface AuthProviderProps {
   children: React.ReactNode;
@@ -35,7 +36,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUser({ email });
     } catch (error) {
       console.error(error);
-      setError("An error occured");
+      setError(handleAxiosError(error));
       setUser(null);
     } finally {
       setLoading(false);
@@ -50,7 +51,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUser({ email });
     } catch (error) {
       console.error(error);
-      setError("An error occured");
+      setError(handleAxiosError(error));
       setUser(null);
     } finally {
       setLoading(false);
@@ -65,14 +66,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUser(null);
     } catch (error) {
       console.error(error);
-      setError("An error occured");
+      setError(handleAxiosError(error));
     } finally {
       setLoading(false);
     }
   }, []);
 
+  const resetError = useCallback(async () => {
+    setError("");
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, isAuthenticated: !!user, loading, error }}>
+    <AuthContext.Provider value={{ user, login, register, logout, isAuthenticated: !!user, loading, error, resetError }}>
       {children}
     </AuthContext.Provider>
   );
